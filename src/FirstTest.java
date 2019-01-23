@@ -1,9 +1,15 @@
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
 
@@ -18,13 +24,13 @@ public class FirstTest {
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         capabilities.setCapability("platformName","Android");
-        capabilities.setCapability("deviceName","AndroidMiA1");
-        capabilities.setCapability("platformVersion","7.1.2");
+        capabilities.setCapability("deviceName","Google Pixel");
+        capabilities.setCapability("platformVersion","8.0");
         capabilities.setCapability("automationName","Appium");
         capabilities.setCapability("appPackage","org.wikipedia");
         capabilities.setCapability("appActivity",".main.MainActivity");
-        capabilities.setCapability("app","/Users/webdev/IdeaProjects/JavaAppiunAutomation/apks/org.wikipedia.apk");
-
+        capabilities.setCapability("app","C:\\Appium1\\apks\\org.wikipedia.apk");
+        capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, "60");
         driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"),capabilities);
 
     }
@@ -38,8 +44,52 @@ public class FirstTest {
 
     @Test
 
-    public void firstTest()
-    {
-        System.out.println("First test run");
+    public void firstTest() {
+		waitForElementAndClick(
+				"//*[contains(@text,'Search Wikipedia')]",
+				"Cannot find Search Wikipedia input",
+				5
+		);
+	waitForElementAndSendKeys(
+		"//*[contains(@text,'Search…')]",
+		"Java",
+		"Cannot find search input",
+		5
+);
+
+		waitForElementPresentByXpath(
+				"//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Object-oriented programming language']",
+				"Cannot find 'Object-oriented programming language' topic searching by 'Java'" ,
+				15
+		);
+
+
     }
-}
+
+	private WebElement waitForElementPresentByXpath(String xpath, String error_message, long timeoutInSeconds)
+	{
+		WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
+		wait.withMessage(error_message + "\n" );
+		By by  = By.xpath(xpath);
+		return wait.until(
+				ExpectedConditions.presenceOfElementLocated(by)
+		);
+	}
+    private WebElement waitForElementPresentByXpath(String xpath, String error_message)
+    {
+        return waitForElementPresentByXpath(xpath,error_message,5);
+    }
+    private WebElement waitForElementAndClick(String xpath, String error_message,long timeOutInSeconds)
+	{
+		WebElement element = waitForElementPresentByXpath(xpath,error_message,timeOutInSeconds);
+		element.click();
+		return element;
+	}
+	private WebElement waitForElementAndSendKeys(String xpath,String value, String error_message,long timeOutInSeconds)
+	{
+		WebElement element = waitForElementPresentByXpath(xpath,error_message,timeOutInSeconds);
+		element.sendKeys(value);
+		return element;
+	}
+    	}
+
